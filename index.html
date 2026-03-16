@@ -1,28 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Moving Home Admin Planner</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
+  <div class="container app-shell">
     <h1>Moving Home Admin Planner</h1>
     <p>Plan your address updates, moving tasks, and essential admin in one place.</p>
 
-    <div class="form-box">
-      <label>Old address</label>
+    <div class="form-box no-print">
+      <label for="oldAddress">Old address</label>
       <textarea id="oldAddress" placeholder="Enter your old address"></textarea>
 
-      <label>Old postcode</label>
+      <label for="oldPostcode">Old postcode</label>
       <input type="text" id="oldPostcode" placeholder="e.g. SR2 0PA">
 
-      <label>New address</label>
+      <label for="newAddress">New address</label>
       <textarea id="newAddress" placeholder="Enter your new address"></textarea>
 
-      <label>New postcode</label>
-      <input type="text" id="newPostcode" placeholder="e.g. SR2 7RD">
+      <label for="newPostcode">New postcode</label>
+      <input type="text" id="newPostcode" placeholder="e.g. DH5 8AG">
 
-      <label>Move date</label>
+      <label for="moveDate">Move date</label>
       <input type="date" id="moveDate">
 
       <div class="checkbox-row">
@@ -31,13 +33,13 @@
       </div>
 
       <div class="button-row">
-        <button onclick="buildPlanner()">Generate My Plan</button>
+        <button type="button" onclick="buildPlanner()">Generate My Plan</button>
         <button type="button" class="secondary-btn" onclick="clearPlanner()">Clear Plan</button>
       </div>
     </div>
 
     <div id="results" class="hidden">
-      <div class="section highlight">
+      <div class="section highlight no-print">
         <h2>Your Moving Summary</h2>
         <p><strong>Old address:</strong> <span id="summaryOld"></span></p>
         <p><strong>Old postcode:</strong> <span id="summaryOldPostcode"></span></p>
@@ -51,28 +53,33 @@
         </div>
       </div>
 
-      <div class="section">
+      <div class="section checklist-print-area">
         <h2>Your Moving Checklist</h2>
+        <div class="print-summary">
+          <p><strong>Move date:</strong> <span id="printMoveDate"></span></p>
+          <p><strong>Old postcode:</strong> <span id="printOldPostcode"></span></p>
+          <p><strong>New postcode:</strong> <span id="printNewPostcode"></span></p>
+        </div>
         <div id="checklist"></div>
       </div>
 
-      <div class="section">
+      <div class="section no-print">
         <h2>Your Moving Timeline</h2>
         <div id="timeline"></div>
       </div>
 
-      <div class="section">
+      <div class="section no-print">
         <h2>Postcode-Based Tools</h2>
         <div id="postcodeTools" class="offers-grid"></div>
       </div>
 
-      <div class="section">
+      <div class="section no-print">
         <h2>Recommended Moving Services</h2>
         <div id="offers" class="offers-grid"></div>
       </div>
 
-      <div class="actions">
-        <button onclick="window.print()">Download / Print PDF</button>
+      <div class="actions no-print">
+        <button type="button" onclick="printChecklist()">Download / Print Checklist PDF</button>
       </div>
     </div>
   </div>
