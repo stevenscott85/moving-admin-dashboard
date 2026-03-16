@@ -7,7 +7,7 @@ body {
 }
 
 .container {
-  max-width: 900px;
+  max-width: 950px;
   margin: auto;
   background: white;
   padding: 40px;
@@ -110,14 +110,6 @@ button:hover {
   display: none;
 }
 
-ul {
-  padding-left: 22px;
-}
-
-li {
-  margin-bottom: 12px;
-}
-
 .timeline-block {
   margin-bottom: 20px;
   padding: 18px;
@@ -150,11 +142,83 @@ li {
   transition: width 0.2s ease;
 }
 
-.check-item {
+.checklist-list {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 500;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checklist-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fafafa;
+}
+
+.check-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex: 1;
+}
+
+.check-left input {
+  margin-top: 4px;
+}
+
+.check-text {
+  font-weight: 600;
+}
+
+.check-note {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+.link-btn {
+  display: inline-block;
+  text-decoration: none;
+  background: #111827;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.link-btn:hover {
+  background: #000;
+}
+
+.no-link {
+  font-size: 13px;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  body {
+    padding: 20px;
+  }
+
+  .container {
+    padding: 24px;
+  }
+
+  .checklist-item {
+    flex-direction: column;
+  }
+
+  .link-btn,
+  .no-link {
+    width: fit-content;
+  }
 }
 
 @media print {
@@ -171,7 +235,9 @@ li {
 
   .form-box,
   .button-row,
-  .actions {
+  .actions,
+  .link-btn,
+  .no-link {
     display: none !important;
   }
 
