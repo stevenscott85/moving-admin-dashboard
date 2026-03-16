@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Moving Admin Planner</title>
-<link rel="stylesheet" href="style.css">
+  <title>Moving Home Admin Planner</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <div class="container">
+    <h1>Moving Home Admin Planner</h1>
 
-<div class="container">
+    <p>This tool will help you update your address across all important services when you move house.</p>
 
-<h1>Moving Home Admin Planner</h1>
+    <button onclick="startPlanner()">Start Address Update</button>
 
-<p>This tool will help you update your address across all important services when you move house.</p>
+    <div id="planner" class="planner hidden">
+      <h2>Your Moving Checklist</h2>
+      <ul id="checklist"></ul>
+    </div>
+  </div>
 
-<button>Start Address Update</button>
-
-</div>
-
+  <script src="script.js"></script>
 </body>
 </html>
