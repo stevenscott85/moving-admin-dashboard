@@ -1,5 +1,21 @@
 const STORAGE_KEY = "movingAdminPlannerData";
-const LEAD_STORAGE_KEY = "movingAdminPlannerLead";
+const UNLOCKED_KEY = "movingPlannerUnlocked";
+const LEAD_NAME_KEY = "movingPlannerLeadName";
+const LEAD_EMAIL_KEY = "movingPlannerLeadEmail";
+
+/*
+  PASTE YOUR REAL SUPABASE VALUES BELOW
+*/
+const SUPABASE_URL = "PASTE_YOUR_PROJECT_URL_HERE";
+const SUPABASE_KEY = "PASTE_YOUR_PUBLISHABLE_OR_ANON_KEY_HERE";
+
+const supabaseClient =
+  SUPABASE_URL &&
+  SUPABASE_KEY &&
+  SUPABASE_URL !== "PASTE_YOUR_PROJECT_URL_HERE" &&
+  SUPABASE_KEY !== "PASTE_YOUR_PUBLISHABLE_OR_ANON_KEY_HERE"
+    ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+    : null;
 
 function formatDate(dateValue) {
   if (!dateValue) return "Not provided";
@@ -43,6 +59,51 @@ function isValidEmail(email) {
 
 function encodeQuery(text) {
   return encodeURIComponent(text);
+}
+
+function savePlannerData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function loadPlannerData() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  return raw ? JSON.parse(raw) : null;
+}
+
+function setLeadMessage(message, type = "info") {
+  const leadMessage = document.getElementById("leadMessage");
+  if (!leadMessage) return;
+
+  if (!message) {
+    leadMessage.textContent = "";
+    leadMessage.className = "lead-message";
+    return;
+  }
+
+  leadMessage.textContent = message;
+  leadMessage.className = `lead-message ${type}`;
+}
+
+function setDownloadButtonsUnlocked(unlocked) {
+  const checklistBtn = document.getElementById("printChecklistBtn");
+  const fullPlanBtn = document.getElementById("printFullPlanBtn");
+
+  if (checklistBtn) checklistBtn.disabled = !unlocked;
+  if (fullPlanBtn) fullPlanBtn.disabled = !unlocked;
+}
+
+function getChecklistProgressPercent() {
+  const checkboxes = document.querySelectorAll(".task-checkbox");
+  const total = checkboxes.length;
+
+  if (total === 0) return 0;
+
+  let checked = 0;
+  checkboxes.forEach((box) => {
+    if (box.checked) checked++;
+  });
+
+  return Math.round((checked / total) * 100);
 }
 
 function getChecklistItems(hasCar, isRenter) {
@@ -291,78 +352,6 @@ function getPostcodeTools(newPostcode) {
   ];
 }
 
-function savePlannerData(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
-function loadPlannerData() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  return raw ? JSON.parse(raw) : null;
-}
-
-function setLeadMessage(message, type = "info") {
-  const leadMessage = document.getElementById("leadMessage");
-  if (!leadMessage) return;
-
-  if (!message) {
-    leadMessage.textContent = "";
-    leadMessage.className = "lead-message";
-    return;
-  }
-
-  leadMessage.textContent = message;
-  leadMessage.className = `lead-message ${type}`;
-}
-
-function saveLead() {
-  const emailInput = document.getElementById("leadEmail");
-  const consentInput = document.getElementById("leadConsent");
-
-  if (!emailInput || !consentInput) return;
-
-  const email = emailInput.value.trim();
-  const consent = consentInput.checked;
-
-  if (!email) {
-    setLeadMessage("Please enter your email address.", "error");
-    return;
-  }
-
-  if (!isValidEmail(email)) {
-    setLeadMessage("Please enter a valid email address.", "error");
-    return;
-  }
-
-  if (!consent) {
-    setLeadMessage("Please tick the consent box before saving.", "error");
-    return;
-  }
-
-  const savedPlanner = loadPlannerData() || {};
-
-  const leadData = {
-    email,
-    consent,
-    savedAt: new Date().toISOString(),
-    moveDate: savedPlanner.moveDate || "",
-    oldPostcode: savedPlanner.oldPostcode || "",
-    newPostcode: savedPlanner.newPostcode || "",
-    hasCar: !!savedPlanner.hasCar,
-    isRenter: !!savedPlanner.isRenter
-  };
-
-  localStorage.setItem(LEAD_STORAGE_KEY, JSON.stringify(leadData));
-
-  savedPlanner.lead = leadData;
-  savePlannerData(savedPlanner);
-
-  setLeadMessage("Planner saved. Next step is connecting this to real email delivery.", "success");
-}
-
-function skipLeadCapture() {
-  setLeadMessage("Skipped for now. You can still save your planner later.", "info");
-}
-
 function updateProgress() {
   const checkboxes = document.querySelectorAll(".task-checkbox");
   const total = checkboxes.length;
@@ -509,6 +498,93 @@ function fillSummary(oldAddress, oldPostcode, newAddress, newPostcode, moveDate)
   document.getElementById("printNewPostcode").textContent = newPostcode;
 }
 
+async function unlockDownloads() {
+  const nameInput = document.getElementById("leadName");
+  const emailInput = document.getElementById("leadEmail");
+  const consentInput = document.getElementById("leadConsent");
+  const button = document.getElementById("saveLeadBtn");
+
+  if (!nameInput || !emailInput || !consentInput || !button) return;
+
+  const fullName = nameInput.value.trim();
+  const email = emailInput.value.trim();
+  const consent = consentInput.checked;
+
+  if (!fullName) {
+    setLeadMessage("Please enter your full name.", "error");
+    return;
+  }
+
+  if (!email) {
+    setLeadMessage("Please enter your email address.", "error");
+    return;
+  }
+
+  if (!isValidEmail(email)) {
+    setLeadMessage("Please enter a valid email address.", "error");
+    return;
+  }
+
+  if (!consent) {
+    setLeadMessage("Please tick the consent box before continuing.", "error");
+    return;
+  }
+
+  if (!supabaseClient) {
+    setLeadMessage("Supabase is not connected yet. Add your project URL and key in script.js.", "error");
+    return;
+  }
+
+  const savedPlanner = loadPlannerData();
+  if (!savedPlanner) {
+    setLeadMessage("Please generate your plan first.", "error");
+    return;
+  }
+
+  const leadPayload = {
+    full_name: fullName,
+    email,
+    consent,
+    old_address: savedPlanner.oldAddress || "",
+    old_postcode: savedPlanner.oldPostcode || "",
+    new_address: savedPlanner.newAddress || "",
+    new_postcode: savedPlanner.newPostcode || "",
+    move_date: savedPlanner.moveDate || null,
+    has_car: !!savedPlanner.hasCar,
+    is_renter: !!savedPlanner.isRenter,
+    checklist_progress: getChecklistProgressPercent()
+  };
+
+  try {
+    button.disabled = true;
+    button.textContent = "Unlocking...";
+    setLeadMessage("Saving your details...", "info");
+
+    const { error } = await supabaseClient
+      .from("moving_planner_leads")
+      .insert([leadPayload]);
+
+    if (error) {
+      console.error(error);
+      setLeadMessage("Could not save your details. Check your Supabase setup and try again.", "error");
+      return;
+    }
+
+    localStorage.setItem(UNLOCKED_KEY, "true");
+    localStorage.setItem(LEAD_NAME_KEY, fullName);
+    localStorage.setItem(LEAD_EMAIL_KEY, email);
+
+    setDownloadButtonsUnlocked(true);
+    setLeadMessage("Download and print unlocked.", "success");
+  } catch (err) {
+    console.error(err);
+    setLeadMessage("Something went wrong. Please try again.", "error");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Unlock Download / Print";
+  }
+}
+
 function buildPlanner() {
   const oldAddress = document.getElementById("oldAddress").value.trim();
   const oldPostcode = normalisePostcode(document.getElementById("oldPostcode").value);
@@ -541,13 +617,19 @@ function buildPlanner() {
 
   document.getElementById("results").classList.remove("hidden");
 
+  const savedName = localStorage.getItem(LEAD_NAME_KEY) || "";
+  const savedEmail = localStorage.getItem(LEAD_EMAIL_KEY) || "";
+
+  const leadName = document.getElementById("leadName");
   const leadEmail = document.getElementById("leadEmail");
   const leadConsent = document.getElementById("leadConsent");
-  const existingLead = JSON.parse(localStorage.getItem(LEAD_STORAGE_KEY) || "null");
 
-  if (leadEmail) leadEmail.value = existingLead?.email || "";
-  if (leadConsent) leadConsent.checked = !!existingLead?.consent;
+  if (leadName) leadName.value = savedName;
+  if (leadEmail) leadEmail.value = savedEmail;
+  if (leadConsent) leadConsent.checked = false;
 
+  setDownloadButtonsUnlocked(false);
+  localStorage.removeItem(UNLOCKED_KEY);
   setLeadMessage("");
 
   savePlannerData({
@@ -559,8 +641,7 @@ function buildPlanner() {
     hasCar,
     isRenter,
     checklistItems,
-    checkedItems: new Array(checklistItems.length).fill(false),
-    lead: existingLead || null
+    checkedItems: new Array(checklistItems.length).fill(false)
   });
 }
 
@@ -592,16 +673,20 @@ function restorePlanner() {
     renderPostcodeTools(getPostcodeTools(saved.newPostcode));
   }
 
-  const savedLead = saved.lead || JSON.parse(localStorage.getItem(LEAD_STORAGE_KEY) || "null");
+  const unlocked = localStorage.getItem(UNLOCKED_KEY) === "true";
+  const savedName = localStorage.getItem(LEAD_NAME_KEY) || "";
+  const savedEmail = localStorage.getItem(LEAD_EMAIL_KEY) || "";
 
-  if (savedLead) {
-    const leadEmail = document.getElementById("leadEmail");
-    const leadConsent = document.getElementById("leadConsent");
+  const leadName = document.getElementById("leadName");
+  const leadEmail = document.getElementById("leadEmail");
 
-    if (leadEmail) leadEmail.value = savedLead.email || "";
-    if (leadConsent) leadConsent.checked = !!savedLead.consent;
+  if (leadName) leadName.value = savedName;
+  if (leadEmail) leadEmail.value = savedEmail;
 
-    setLeadMessage("Previously saved planner email restored.", "info");
+  setDownloadButtonsUnlocked(unlocked);
+
+  if (unlocked) {
+    setLeadMessage("Download and print already unlocked.", "info");
   } else {
     setLeadMessage("");
   }
@@ -611,7 +696,9 @@ function restorePlanner() {
 
 function clearPlanner() {
   localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem(LEAD_STORAGE_KEY);
+  localStorage.removeItem(UNLOCKED_KEY);
+  localStorage.removeItem(LEAD_NAME_KEY);
+  localStorage.removeItem(LEAD_EMAIL_KEY);
 
   document.getElementById("oldAddress").value = "";
   document.getElementById("oldPostcode").value = "";
@@ -621,9 +708,11 @@ function clearPlanner() {
   document.getElementById("hasCar").checked = false;
   document.getElementById("isRenter").checked = false;
 
+  const leadName = document.getElementById("leadName");
   const leadEmail = document.getElementById("leadEmail");
   const leadConsent = document.getElementById("leadConsent");
 
+  if (leadName) leadName.value = "";
   if (leadEmail) leadEmail.value = "";
   if (leadConsent) leadConsent.checked = false;
 
@@ -636,6 +725,7 @@ function clearPlanner() {
   document.getElementById("progressText").textContent = "0%";
   document.getElementById("progressFill").style.width = "0%";
 
+  setDownloadButtonsUnlocked(false);
   setLeadMessage("");
 }
 
