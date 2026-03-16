@@ -309,21 +309,33 @@ button:hover {
   }
 }
 
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
 @media print {
   body {
     background: white;
     padding: 0;
+    font-size: 11pt;
+    line-height: 1.25;
+    color: #000;
   }
 
   .container {
     box-shadow: none;
     max-width: 100%;
+    width: 100%;
     padding: 0;
     border-radius: 0;
+    margin: 0;
   }
 
   .section {
     box-shadow: none;
+    border: none;
+    border-radius: 0;
   }
 
   .link-btn,
@@ -336,8 +348,99 @@ button:hover {
   .badge,
   .badge-official,
   .badge-partner,
-  .badge-manual {
+  .badge-manual,
+  .progress-bar {
     display: none !important;
+  }
+
+  h1 {
+    font-size: 22pt;
+    margin: 0 0 6mm 0;
+    line-height: 1.1;
+  }
+
+  h2 {
+    font-size: 15pt;
+    margin: 0 0 4mm 0;
+    line-height: 1.15;
+  }
+
+  h3 {
+    font-size: 12pt;
+    margin: 0 0 2mm 0;
+  }
+
+  p {
+    margin: 0 0 3mm 0;
+    line-height: 1.3;
+  }
+
+  ul {
+    margin: 2mm 0 0 5mm;
+    padding: 0;
+  }
+
+  li {
+    margin: 0 0 1.5mm 0;
+  }
+
+  .checklist-list {
+    gap: 6px;
+  }
+
+  .checklist-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 7px 9px;
+    gap: 8px;
+    margin: 0;
+  }
+
+  .check-left {
+    gap: 8px;
+  }
+
+  .check-left input {
+    width: 14px;
+    height: 14px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .check-text {
+    font-size: 11.2pt;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 1px;
+  }
+
+  .check-note {
+    font-size: 9.6pt;
+    line-height: 1.2;
+    color: #333;
+    margin-top: 0;
+  }
+
+  .check-actions {
+    display: none !important;
+  }
+
+  .timeline-block {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 7px;
+  }
+
+  .summary-section p {
+    margin-bottom: 2.2mm;
   }
 
   body.print-checklist-only .print-full-only {
@@ -346,20 +449,22 @@ button:hover {
 
   body.print-checklist-only .checklist-print-only {
     display: block !important;
-    margin-bottom: 20px;
+    margin-bottom: 5mm;
   }
 
   body.print-checklist-only .checklist-print-area {
     display: block !important;
-    border: none;
     padding: 0;
     margin-top: 0;
   }
 
-  body.print-checklist-only .checklist-item {
-    break-inside: avoid;
-    page-break-inside: avoid;
-    background: white;
+  body.print-checklist-only .checklist-print-area h2 {
+    margin-bottom: 4mm;
+  }
+
+  body.print-checklist-only .print-summary p {
+    font-size: 10.5pt;
+    margin-bottom: 2mm;
   }
 
   body.print-full-plan .print-full-only {
@@ -374,16 +479,20 @@ button:hover {
   body.print-full-plan .checklist-print-area,
   body.print-full-plan .timeline-section {
     display: block !important;
-    border: none;
     padding: 0;
     margin-top: 0;
-    margin-bottom: 24px;
+    margin-bottom: 7mm;
   }
 
-  body.print-full-plan .checklist-item,
-  body.print-full-plan .timeline-block {
-    break-inside: avoid;
-    page-break-inside: avoid;
-    background: white;
+  body.print-full-plan .summary-section {
+    page-break-after: avoid;
+  }
+
+  body.print-full-plan .checklist-print-area {
+    page-break-after: auto;
+  }
+
+  body.print-full-plan .timeline-section {
+    page-break-before: auto;
   }
 }
