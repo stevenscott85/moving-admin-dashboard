@@ -7,7 +7,7 @@ body {
 }
 
 .container {
-  max-width: 950px;
+  max-width: 980px;
   margin: auto;
   background: white;
   padding: 40px;
@@ -181,6 +181,13 @@ button:hover {
   font-weight: 400;
 }
 
+.check-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
 .link-btn {
   display: inline-block;
   text-decoration: none;
@@ -196,10 +203,75 @@ button:hover {
   background: #000;
 }
 
-.no-link {
-  font-size: 13px;
+.partner-btn {
+  background: #2563eb;
+}
+
+.partner-btn:hover {
+  background: #1d4ed8;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.badge-official {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-partner {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.badge-manual {
+  background: #f3f4f6;
   color: #6b7280;
-  white-space: nowrap;
+}
+
+.offers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.offer-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 18px;
+  background: #fafafa;
+}
+
+.offer-card h3 {
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+.offer-card p {
+  font-size: 14px;
+  color: #4b5563;
+  min-height: 50px;
+}
+
+.offer-card a {
+  display: inline-block;
+  margin-top: 10px;
+  text-decoration: none;
+  background: #2563eb;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.offer-card a:hover {
+  background: #1d4ed8;
 }
 
 @media (max-width: 700px) {
@@ -215,9 +287,8 @@ button:hover {
     flex-direction: column;
   }
 
-  .link-btn,
-  .no-link {
-    width: fit-content;
+  .check-actions {
+    align-items: flex-start;
   }
 }
 
@@ -237,7 +308,8 @@ button:hover {
   .button-row,
   .actions,
   .link-btn,
-  .no-link {
+  .partner-btn,
+  .offers-grid {
     display: none !important;
   }
 
