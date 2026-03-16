@@ -32,67 +32,80 @@ function getChecklistItems(hasCar, isRenter) {
     {
       text: "Update bank accounts",
       note: "Change your registered address with all bank accounts and credit cards.",
-      link: ""
+      link: "",
+      type: "manual"
     },
     {
       text: "Update HMRC records",
       note: "Update your address through your HMRC Personal Tax Account.",
-      link: "https://www.gov.uk/tell-hmrc-change-address"
+      link: "https://www.gov.uk/tell-hmrc-change-address",
+      type: "official"
     },
     {
       text: "Update council tax",
       note: "Tell your local council you are moving in or out.",
-      link: "https://www.gov.uk/council-tax"
+      link: "https://www.gov.uk/council-tax",
+      type: "official"
     },
     {
       text: "Update electoral roll",
       note: "Register to vote again at your new address.",
-      link: "https://www.gov.uk/register-to-vote"
+      link: "https://www.gov.uk/register-to-vote",
+      type: "official"
     },
     {
       text: "Update GP / NHS details",
       note: "Contact your GP surgery or register with a new GP if needed.",
-      link: "https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/"
+      link: "https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/",
+      type: "official"
     },
     {
       text: "Update insurance policies",
       note: "Update home, contents, life, and any other insurance policies.",
-      link: ""
+      link: "https://www.comparethemarket.com/home-insurance/",
+      type: "partner"
     },
     {
       text: "Update energy supplier",
       note: "Contact your gas and electricity supplier and provide meter readings.",
-      link: ""
+      link: "https://www.uswitch.com/gas-electricity/",
+      type: "partner"
     },
     {
       text: "Update broadband provider",
       note: "Tell your broadband provider your move date and new address.",
-      link: ""
+      link: "https://www.uswitch.com/broadband/",
+      type: "partner"
     },
     {
       text: "Update Amazon delivery address",
       note: "Update your default address in Amazon account settings.",
-      link: "https://www.amazon.co.uk/"
+      link: "https://www.amazon.co.uk/",
+      type: "official"
     },
     {
       text: "Update PayPal billing address",
       note: "Change your billing and delivery addresses in PayPal.",
-      link: "https://www.paypal.com/uk/home"
+      link: "https://www.paypal.com/uk/home",
+      type: "official"
     },
     {
       text: "Update subscriptions",
       note: "Update magazine, streaming, membership, and subscription services.",
-      link: ""
+      link: "",
+      type: "manual"
     },
     {
       text: "Update employer records",
       note: "Tell payroll and HR your new address.",
-      link: ""
+      link: "",
+      type: "manual"
     },
     {
       text: "Arrange Royal Mail redirection",
       note: "Redirect mail from your old address to your new one.",
-      link: "https://www.royalmail.com/personal/receiving-mail/redirection"
+      link: "https://www.royalmail.com/personal/receiving-mail/redirection",
+      type: "official"
     }
   ];
 
@@ -100,19 +113,22 @@ function getChecklistItems(hasCar, isRenter) {
     items.unshift({
       text: "Update DVLA driving licence",
       note: "Update the address on your driving licence.",
-      link: "https://www.gov.uk/change-address-driving-licence"
+      link: "https://www.gov.uk/change-address-driving-licence",
+      type: "official"
     });
 
     items.unshift({
       text: "Update vehicle logbook (V5C)",
       note: "Update the address on your vehicle registration certificate.",
-      link: "https://www.gov.uk/change-address-v5c"
+      link: "https://www.gov.uk/change-address-v5c",
+      type: "official"
     });
 
     items.push({
       text: "Update car insurance address",
       note: "Your insurer needs your new address immediately.",
-      link: ""
+      link: "https://www.comparethemarket.com/car-insurance/",
+      type: "partner"
     });
   }
 
@@ -120,19 +136,22 @@ function getChecklistItems(hasCar, isRenter) {
     items.push({
       text: "Notify landlord / letting agent",
       note: "Confirm move-out, final inspection, and handover details.",
-      link: ""
+      link: "",
+      type: "manual"
     });
 
     items.push({
       text: "Confirm deposit and tenancy end arrangements",
       note: "Make sure meter readings, keys, and deposit return process are clear.",
-      link: ""
+      link: "",
+      type: "manual"
     });
   } else {
     items.push({
       text: "Check buildings and contents insurance for new property",
       note: "Make sure the new property is covered from move-in day.",
-      link: ""
+      link: "https://www.comparethemarket.com/home-insurance/",
+      type: "partner"
     });
   }
 
@@ -189,6 +208,44 @@ function getTimelineData() {
   ];
 }
 
+function getOffers(hasCar, isRenter) {
+  const offers = [
+    {
+      title: "Compare Broadband Deals",
+      text: "Check broadband packages for your new home.",
+      link: "https://www.uswitch.com/broadband/"
+    },
+    {
+      title: "Compare Energy Deals",
+      text: "Review gas and electricity tariffs after your move.",
+      link: "https://www.uswitch.com/gas-electricity/"
+    },
+    {
+      title: "Mail Redirection",
+      text: "Redirect post from your old address to your new one.",
+      link: "https://www.royalmail.com/personal/receiving-mail/redirection"
+    }
+  ];
+
+  if (hasCar) {
+    offers.push({
+      title: "Compare Car Insurance",
+      text: "Your car insurance premium may change when you move.",
+      link: "https://www.comparethemarket.com/car-insurance/"
+    });
+  }
+
+  offers.push({
+    title: "Compare Home Insurance",
+    text: isRenter
+      ? "Check contents insurance for your new home."
+      : "Check buildings and contents insurance for your new home.",
+    link: "https://www.comparethemarket.com/home-insurance/"
+  });
+
+  return offers;
+}
+
 function savePlannerData(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
@@ -224,6 +281,28 @@ function updateProgress() {
   }
 }
 
+function getBadge(type) {
+  if (type === "official") {
+    return `<span class="badge badge-official">Official</span>`;
+  }
+  if (type === "partner") {
+    return `<span class="badge badge-partner">Partner</span>`;
+  }
+  return `<span class="badge badge-manual">Manual</span>`;
+}
+
+function getActionButton(item) {
+  if (item.type === "official" && item.link) {
+    return `<a class="link-btn" href="${item.link}" target="_blank" rel="noopener noreferrer">Official link</a>`;
+  }
+
+  if (item.type === "partner" && item.link) {
+    return `<a class="link-btn partner-btn" href="${item.link}" target="_blank" rel="noopener noreferrer">Compare options</a>`;
+  }
+
+  return `<span class="no-link">Manual update</span>`;
+}
+
 function renderChecklist(items, checkedItems = []) {
   const checklist = document.getElementById("checklist");
   checklist.innerHTML = "";
@@ -243,11 +322,10 @@ function renderChecklist(items, checkedItems = []) {
           <div class="check-note">${item.note}</div>
         </div>
       </div>
-      ${
-        item.link
-          ? `<a class="link-btn" href="${item.link}" target="_blank" rel="noopener noreferrer">Official link</a>`
-          : `<span class="no-link">Manual update</span>`
-      }
+      <div class="check-actions">
+        ${getBadge(item.type)}
+        ${getActionButton(item)}
+      </div>
     `;
 
     checklist.appendChild(row);
@@ -279,6 +357,24 @@ function renderTimeline(timelineData) {
   });
 }
 
+function renderOffers(offers) {
+  const offersBox = document.getElementById("offers");
+  offersBox.innerHTML = "";
+
+  offers.forEach(offer => {
+    const card = document.createElement("div");
+    card.className = "offer-card";
+
+    card.innerHTML = `
+      <h3>${offer.title}</h3>
+      <p>${offer.text}</p>
+      <a href="${offer.link}" target="_blank" rel="noopener noreferrer">View option</a>
+    `;
+
+    offersBox.appendChild(card);
+  });
+}
+
 function fillSummary(oldAddress, newAddress, moveDate) {
   document.getElementById("summaryOld").textContent = oldAddress.replace(/\n/g, " ");
   document.getElementById("summaryNew").textContent = newAddress.replace(/\n/g, " ");
@@ -300,10 +396,12 @@ function buildPlanner() {
 
   const checklistItems = getChecklistItems(hasCar, isRenter);
   const timelineData = getTimelineData();
+  const offers = getOffers(hasCar, isRenter);
 
   fillSummary(oldAddress, newAddress, moveDate);
   renderChecklist(checklistItems, []);
   renderTimeline(timelineData);
+  renderOffers(offers);
 
   document.getElementById("results").classList.remove("hidden");
 
@@ -331,6 +429,7 @@ function restorePlanner() {
   fillSummary(saved.oldAddress, saved.newAddress, saved.moveDate);
   renderChecklist(saved.checklistItems || [], saved.checkedItems || []);
   renderTimeline(getTimelineData());
+  renderOffers(getOffers(saved.hasCar, saved.isRenter));
 
   document.getElementById("results").classList.remove("hidden");
 }
@@ -346,6 +445,7 @@ function clearPlanner() {
 
   document.getElementById("checklist").innerHTML = "";
   document.getElementById("timeline").innerHTML = "";
+  document.getElementById("offers").innerHTML = "";
   document.getElementById("results").classList.add("hidden");
 
   document.getElementById("progressText").textContent = "0%";
