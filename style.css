@@ -141,6 +141,11 @@ button:hover {
   background: var(--blue-dark);
 }
 
+button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .secondary-btn {
   background: var(--gray-btn);
 }
