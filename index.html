@@ -8,8 +8,10 @@
 </head>
 <body>
   <div class="container app-shell">
-    <h1>Moving Home Admin Planner</h1>
-    <p>Plan your address updates, moving tasks, and essential admin in one place.</p>
+    <header class="page-header">
+      <h1>Moving Home Admin Planner</h1>
+      <p class="intro">Plan your address updates, moving tasks, and essential admin in one place.</p>
+    </header>
 
     <div class="form-box no-print">
       <label for="oldAddress">Old address</label>
@@ -39,46 +41,53 @@
     </div>
 
     <div id="results" class="hidden">
-      <div class="section summary-section print-full-only">
+      <section class="section summary-section print-full-only">
         <h2>Your Moving Summary</h2>
-        <p><strong>Old address:</strong> <span id="summaryOld"></span></p>
-        <p><strong>Old postcode:</strong> <span id="summaryOldPostcode"></span></p>
-        <p><strong>New address:</strong> <span id="summaryNew"></span></p>
-        <p><strong>New postcode:</strong> <span id="summaryNewPostcode"></span></p>
-        <p><strong>Move date:</strong> <span id="summaryDate"></span></p>
-        <p><strong>Days until move:</strong> <span id="summaryCountdown"></span></p>
-        <p><strong>Checklist progress:</strong> <span id="progressText">0%</span></p>
+        <div class="summary-grid">
+          <div class="summary-row"><span class="summary-label">Old address</span><span id="summaryOld"></span></div>
+          <div class="summary-row"><span class="summary-label">Old postcode</span><span id="summaryOldPostcode"></span></div>
+          <div class="summary-row"><span class="summary-label">New address</span><span id="summaryNew"></span></div>
+          <div class="summary-row"><span class="summary-label">New postcode</span><span id="summaryNewPostcode"></span></div>
+          <div class="summary-row"><span class="summary-label">Move date</span><span id="summaryDate"></span></div>
+          <div class="summary-row"><span class="summary-label">Days until move</span><span id="summaryCountdown"></span></div>
+          <div class="summary-row summary-progress-row">
+            <span class="summary-label">Checklist progress</span>
+            <span id="progressText">0%</span>
+          </div>
+        </div>
         <div class="progress-bar">
           <div id="progressFill" class="progress-fill"></div>
         </div>
-      </div>
+      </section>
 
-      <div class="section checklist-print-area">
+      <section class="section checklist-print-area">
         <h2>Your Moving Checklist</h2>
 
         <div class="print-summary checklist-print-only">
-          <p><strong>Move date:</strong> <span id="printMoveDate"></span></p>
-          <p><strong>Old postcode:</strong> <span id="printOldPostcode"></span></p>
-          <p><strong>New postcode:</strong> <span id="printNewPostcode"></span></p>
+          <div class="print-summary-grid">
+            <div><strong>Move date:</strong> <span id="printMoveDate"></span></div>
+            <div><strong>Old postcode:</strong> <span id="printOldPostcode"></span></div>
+            <div><strong>New postcode:</strong> <span id="printNewPostcode"></span></div>
+          </div>
         </div>
 
-        <div id="checklist"></div>
-      </div>
+        <div id="checklist" class="checklist-list"></div>
+      </section>
 
-      <div class="section timeline-section print-full-only">
+      <section class="section timeline-section print-full-only">
         <h2>Your Moving Timeline</h2>
         <div id="timeline"></div>
-      </div>
+      </section>
 
-      <div class="section no-print">
+      <section class="section no-print">
         <h2>Postcode-Based Tools</h2>
         <div id="postcodeTools" class="offers-grid"></div>
-      </div>
+      </section>
 
-      <div class="section no-print">
+      <section class="section no-print">
         <h2>Recommended Moving Services</h2>
         <div id="offers" class="offers-grid"></div>
-      </div>
+      </section>
 
       <div class="actions no-print">
         <button type="button" onclick="printChecklistOnly()">Download / Print Checklist Only</button>
