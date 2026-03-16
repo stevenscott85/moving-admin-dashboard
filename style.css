@@ -90,7 +90,8 @@ label {
 
 textarea,
 input[type="date"],
-input[type="text"] {
+input[type="text"],
+input[type="email"] {
   width: 100%;
   padding: 12px;
   border: 1px solid #cbd5e1;
@@ -353,6 +354,58 @@ button:hover {
   background: var(--blue-dark);
 }
 
+.lead-section {
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+}
+
+.lead-text {
+  color: #374151;
+  margin-bottom: 16px;
+}
+
+.lead-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lead-field {
+  max-width: 460px;
+}
+
+.lead-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-weight: 500;
+  margin: 0;
+  color: #1f2937;
+}
+
+.lead-consent input {
+  margin-top: 3px;
+}
+
+.lead-message {
+  min-height: 20px;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.lead-message.success {
+  color: #166534;
+}
+
+.lead-message.error {
+  color: #b91c1c;
+}
+
+.lead-message.info {
+  color: #374151;
+}
+
 .print-summary {
   display: none;
 }
@@ -384,6 +437,14 @@ button:hover {
   }
 
   .check-actions {
+    align-items: flex-start;
+  }
+
+  .lead-field {
+    max-width: 100%;
+  }
+
+  .lead-consent {
     align-items: flex-start;
   }
 }
