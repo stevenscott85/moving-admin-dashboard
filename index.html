@@ -39,7 +39,7 @@
     </div>
 
     <div id="results" class="hidden">
-      <div class="section highlight no-print">
+      <div class="section summary-section print-full-only">
         <h2>Your Moving Summary</h2>
         <p><strong>Old address:</strong> <span id="summaryOld"></span></p>
         <p><strong>Old postcode:</strong> <span id="summaryOldPostcode"></span></p>
@@ -55,15 +55,17 @@
 
       <div class="section checklist-print-area">
         <h2>Your Moving Checklist</h2>
-        <div class="print-summary">
+
+        <div class="print-summary checklist-print-only">
           <p><strong>Move date:</strong> <span id="printMoveDate"></span></p>
           <p><strong>Old postcode:</strong> <span id="printOldPostcode"></span></p>
           <p><strong>New postcode:</strong> <span id="printNewPostcode"></span></p>
         </div>
+
         <div id="checklist"></div>
       </div>
 
-      <div class="section no-print">
+      <div class="section timeline-section print-full-only">
         <h2>Your Moving Timeline</h2>
         <div id="timeline"></div>
       </div>
@@ -79,7 +81,8 @@
       </div>
 
       <div class="actions no-print">
-        <button type="button" onclick="printChecklist()">Download / Print Checklist PDF</button>
+        <button type="button" onclick="printChecklistOnly()">Download / Print Checklist Only</button>
+        <button type="button" class="secondary-btn" onclick="printFullPlan()">Download / Print Full Plan</button>
       </div>
     </div>
   </div>
