@@ -90,12 +90,17 @@
       </section>
 
       <section class="section no-print lead-section">
-        <h2>Save Your Moving Planner</h2>
+        <h2>Download / Print Your Planner</h2>
         <p class="lead-text">
-          Enter your email to save your personalised checklist and prepare for moving reminders.
+          Enter your name and email to unlock your personalised planner download and print options.
         </p>
 
         <div class="lead-form">
+          <div class="lead-field">
+            <label for="leadName">Full name</label>
+            <input type="text" id="leadName" placeholder="Your full name" autocomplete="name">
+          </div>
+
           <div class="lead-field">
             <label for="leadEmail">Email address</label>
             <input type="email" id="leadEmail" placeholder="you@example.com" autocomplete="email">
@@ -103,12 +108,11 @@
 
           <label class="lead-consent">
             <input type="checkbox" id="leadConsent">
-            I agree to receive my saved planner and helpful moving reminders.
+            I agree to receive my planner and helpful moving reminders.
           </label>
 
           <div class="button-row">
-            <button type="button" onclick="saveLead()">Save My Planner</button>
-            <button type="button" class="secondary-btn" onclick="skipLeadCapture()">Skip for now</button>
+            <button type="button" id="saveLeadBtn" onclick="unlockDownloads()">Unlock Download / Print</button>
           </div>
 
           <p id="leadMessage" class="lead-message"></p>
@@ -116,12 +120,17 @@
       </section>
 
       <div class="actions no-print">
-        <button type="button" onclick="printChecklistOnly()">Download / Print Checklist Only</button>
-        <button type="button" class="secondary-btn" onclick="printFullPlan()">Download / Print Full Plan</button>
+        <button type="button" id="printChecklistBtn" onclick="printChecklistOnly()" disabled>
+          Download / Print Checklist Only
+        </button>
+        <button type="button" id="printFullPlanBtn" class="secondary-btn" onclick="printFullPlan()" disabled>
+          Download / Print Full Plan
+        </button>
       </div>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
 </body>
 </html>
