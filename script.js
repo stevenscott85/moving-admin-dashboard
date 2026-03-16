@@ -28,36 +28,115 @@ function daysUntilMove(dateValue) {
 }
 
 function getChecklistItems(hasCar, isRenter) {
-  const checklistItems = [
-    "Update bank accounts",
-    "Update HMRC records",
-    "Update council tax",
-    "Update electoral roll",
-    "Update GP / NHS details",
-    "Update insurance policies",
-    "Update energy supplier",
-    "Update broadband provider",
-    "Update Amazon delivery address",
-    "Update PayPal billing address",
-    "Update subscriptions",
-    "Update employer records",
-    "Arrange Royal Mail redirection"
+  const items = [
+    {
+      text: "Update bank accounts",
+      note: "Change your registered address with all bank accounts and credit cards.",
+      link: ""
+    },
+    {
+      text: "Update HMRC records",
+      note: "Update your address through your HMRC Personal Tax Account.",
+      link: "https://www.gov.uk/tell-hmrc-change-address"
+    },
+    {
+      text: "Update council tax",
+      note: "Tell your local council you are moving in or out.",
+      link: "https://www.gov.uk/council-tax"
+    },
+    {
+      text: "Update electoral roll",
+      note: "Register to vote again at your new address.",
+      link: "https://www.gov.uk/register-to-vote"
+    },
+    {
+      text: "Update GP / NHS details",
+      note: "Contact your GP surgery or register with a new GP if needed.",
+      link: "https://www.nhs.uk/nhs-services/gps/how-to-register-with-a-gp-surgery/"
+    },
+    {
+      text: "Update insurance policies",
+      note: "Update home, contents, life, and any other insurance policies.",
+      link: ""
+    },
+    {
+      text: "Update energy supplier",
+      note: "Contact your gas and electricity supplier and provide meter readings.",
+      link: ""
+    },
+    {
+      text: "Update broadband provider",
+      note: "Tell your broadband provider your move date and new address.",
+      link: ""
+    },
+    {
+      text: "Update Amazon delivery address",
+      note: "Update your default address in Amazon account settings.",
+      link: "https://www.amazon.co.uk/"
+    },
+    {
+      text: "Update PayPal billing address",
+      note: "Change your billing and delivery addresses in PayPal.",
+      link: "https://www.paypal.com/uk/home"
+    },
+    {
+      text: "Update subscriptions",
+      note: "Update magazine, streaming, membership, and subscription services.",
+      link: ""
+    },
+    {
+      text: "Update employer records",
+      note: "Tell payroll and HR your new address.",
+      link: ""
+    },
+    {
+      text: "Arrange Royal Mail redirection",
+      note: "Redirect mail from your old address to your new one.",
+      link: "https://www.royalmail.com/personal/receiving-mail/redirection"
+    }
   ];
 
   if (hasCar) {
-    checklistItems.unshift("Update DVLA driving licence");
-    checklistItems.unshift("Update vehicle logbook (V5C)");
-    checklistItems.push("Update car insurance address");
+    items.unshift({
+      text: "Update DVLA driving licence",
+      note: "Update the address on your driving licence.",
+      link: "https://www.gov.uk/change-address-driving-licence"
+    });
+
+    items.unshift({
+      text: "Update vehicle logbook (V5C)",
+      note: "Update the address on your vehicle registration certificate.",
+      link: "https://www.gov.uk/change-address-v5c"
+    });
+
+    items.push({
+      text: "Update car insurance address",
+      note: "Your insurer needs your new address immediately.",
+      link: ""
+    });
   }
 
   if (isRenter) {
-    checklistItems.push("Notify landlord / letting agent");
-    checklistItems.push("Confirm deposit and tenancy end arrangements");
+    items.push({
+      text: "Notify landlord / letting agent",
+      note: "Confirm move-out, final inspection, and handover details.",
+      link: ""
+    });
+
+    items.push({
+      text: "Confirm deposit and tenancy end arrangements",
+      note: "Make sure meter readings, keys, and deposit return process are clear.",
+      link: ""
+    });
   } else {
-    checklistItems.push("Check buildings and contents insurance for new property");
+    items.push({
+      text: "Check buildings and contents insurance for new property",
+      note: "Make sure the new property is covered from move-in day.",
+      link: ""
+    });
   }
 
-  return checklistItems;
+  return items;
 }
 
 function getTimelineData() {
@@ -148,18 +227,30 @@ function updateProgress() {
 function renderChecklist(items, checkedItems = []) {
   const checklist = document.getElementById("checklist");
   checklist.innerHTML = "";
+  checklist.className = "checklist-list";
 
   items.forEach((item, index) => {
-    const li = document.createElement("li");
+    const row = document.createElement("div");
+    row.className = "checklist-item";
 
-    li.innerHTML = `
-      <label class="check-item">
-        <input type="checkbox" class="task-checkbox" data-index="${index}" ${checkedItems[index] ? "checked" : ""}>
-        ${item}
-      </label>
+    const checked = checkedItems[index] ? "checked" : "";
+
+    row.innerHTML = `
+      <div class="check-left">
+        <input type="checkbox" class="task-checkbox" data-index="${index}" ${checked}>
+        <div>
+          <div class="check-text">${item.text}</div>
+          <div class="check-note">${item.note}</div>
+        </div>
+      </div>
+      ${
+        item.link
+          ? `<a class="link-btn" href="${item.link}" target="_blank" rel="noopener noreferrer">Official link</a>`
+          : `<span class="no-link">Manual update</span>`
+      }
     `;
 
-    checklist.appendChild(li);
+    checklist.appendChild(row);
   });
 
   document.querySelectorAll(".task-checkbox").forEach(box => {
@@ -256,6 +347,9 @@ function clearPlanner() {
   document.getElementById("checklist").innerHTML = "";
   document.getElementById("timeline").innerHTML = "";
   document.getElementById("results").classList.add("hidden");
+
+  document.getElementById("progressText").textContent = "0%";
+  document.getElementById("progressFill").style.width = "0%";
 }
 
 window.addEventListener("load", restorePlanner);
