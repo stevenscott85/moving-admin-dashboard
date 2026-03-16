@@ -4,18 +4,50 @@
   <title>Moving Home Admin Planner</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
   <div class="container">
     <h1>Moving Home Admin Planner</h1>
+    <p>Plan your address updates, moving tasks, and essential admin in one place.</p>
 
-    <p>This tool will help you update your address across all important services when you move house.</p>
+    <div class="form-box">
+      <label>Old address</label>
+      <textarea id="oldAddress" placeholder="Enter your old address"></textarea>
 
-    <button onclick="startPlanner()">Start Address Update</button>
+      <label>New address</label>
+      <textarea id="newAddress" placeholder="Enter your new address"></textarea>
 
-    <div id="planner" class="planner hidden">
-      <h2>Your Moving Checklist</h2>
-      <ul id="checklist"></ul>
+      <label>Move date</label>
+      <input type="date" id="moveDate">
+
+      <div class="checkbox-row">
+        <label><input type="checkbox" id="hasCar"> I have a car</label>
+        <label><input type="checkbox" id="isRenter"> I rent my home</label>
+      </div>
+
+      <button onclick="buildPlanner()">Generate My Plan</button>
+    </div>
+
+    <div id="results" class="hidden">
+      <div class="section">
+        <h2>Your Moving Summary</h2>
+        <p><strong>Old address:</strong> <span id="summaryOld"></span></p>
+        <p><strong>New address:</strong> <span id="summaryNew"></span></p>
+        <p><strong>Move date:</strong> <span id="summaryDate"></span></p>
+      </div>
+
+      <div class="section">
+        <h2>Your Moving Checklist</h2>
+        <ul id="checklist"></ul>
+      </div>
+
+      <div class="section">
+        <h2>Your Moving Timeline</h2>
+        <div id="timeline"></div>
+      </div>
+
+      <div class="actions">
+        <button onclick="window.print()">Download / Print PDF</button>
+      </div>
     </div>
   </div>
 
