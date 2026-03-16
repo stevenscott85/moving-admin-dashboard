@@ -1,4 +1,5 @@
 const STORAGE_KEY = "movingAdminPlannerData";
+const LEAD_STORAGE_KEY = "movingAdminPlannerLead";
 
 function formatDate(dateValue) {
   if (!dateValue) return "Not provided";
@@ -34,6 +35,10 @@ function normalisePostcode(postcode) {
 function isValidUkPostcode(postcode) {
   const regex = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i;
   return regex.test(postcode.trim());
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
 function encodeQuery(text) {
@@ -295,6 +300,69 @@ function loadPlannerData() {
   return raw ? JSON.parse(raw) : null;
 }
 
+function setLeadMessage(message, type = "info") {
+  const leadMessage = document.getElementById("leadMessage");
+  if (!leadMessage) return;
+
+  if (!message) {
+    leadMessage.textContent = "";
+    leadMessage.className = "lead-message";
+    return;
+  }
+
+  leadMessage.textContent = message;
+  leadMessage.className = `lead-message ${type}`;
+}
+
+function saveLead() {
+  const emailInput = document.getElementById("leadEmail");
+  const consentInput = document.getElementById("leadConsent");
+
+  if (!emailInput || !consentInput) return;
+
+  const email = emailInput.value.trim();
+  const consent = consentInput.checked;
+
+  if (!email) {
+    setLeadMessage("Please enter your email address.", "error");
+    return;
+  }
+
+  if (!isValidEmail(email)) {
+    setLeadMessage("Please enter a valid email address.", "error");
+    return;
+  }
+
+  if (!consent) {
+    setLeadMessage("Please tick the consent box before saving.", "error");
+    return;
+  }
+
+  const savedPlanner = loadPlannerData() || {};
+
+  const leadData = {
+    email,
+    consent,
+    savedAt: new Date().toISOString(),
+    moveDate: savedPlanner.moveDate || "",
+    oldPostcode: savedPlanner.oldPostcode || "",
+    newPostcode: savedPlanner.newPostcode || "",
+    hasCar: !!savedPlanner.hasCar,
+    isRenter: !!savedPlanner.isRenter
+  };
+
+  localStorage.setItem(LEAD_STORAGE_KEY, JSON.stringify(leadData));
+
+  savedPlanner.lead = leadData;
+  savePlannerData(savedPlanner);
+
+  setLeadMessage("Planner saved. Next step is connecting this to real email delivery.", "success");
+}
+
+function skipLeadCapture() {
+  setLeadMessage("Skipped for now. You can still save your planner later.", "info");
+}
+
 function updateProgress() {
   const checkboxes = document.querySelectorAll(".task-checkbox");
   const total = checkboxes.length;
@@ -473,6 +541,15 @@ function buildPlanner() {
 
   document.getElementById("results").classList.remove("hidden");
 
+  const leadEmail = document.getElementById("leadEmail");
+  const leadConsent = document.getElementById("leadConsent");
+  const existingLead = JSON.parse(localStorage.getItem(LEAD_STORAGE_KEY) || "null");
+
+  if (leadEmail) leadEmail.value = existingLead?.email || "";
+  if (leadConsent) leadConsent.checked = !!existingLead?.consent;
+
+  setLeadMessage("");
+
   savePlannerData({
     oldAddress,
     oldPostcode,
@@ -482,7 +559,8 @@ function buildPlanner() {
     hasCar,
     isRenter,
     checklistItems,
-    checkedItems: new Array(checklistItems.length).fill(false)
+    checkedItems: new Array(checklistItems.length).fill(false),
+    lead: existingLead || null
   });
 }
 
@@ -514,11 +592,26 @@ function restorePlanner() {
     renderPostcodeTools(getPostcodeTools(saved.newPostcode));
   }
 
+  const savedLead = saved.lead || JSON.parse(localStorage.getItem(LEAD_STORAGE_KEY) || "null");
+
+  if (savedLead) {
+    const leadEmail = document.getElementById("leadEmail");
+    const leadConsent = document.getElementById("leadConsent");
+
+    if (leadEmail) leadEmail.value = savedLead.email || "";
+    if (leadConsent) leadConsent.checked = !!savedLead.consent;
+
+    setLeadMessage("Previously saved planner email restored.", "info");
+  } else {
+    setLeadMessage("");
+  }
+
   document.getElementById("results").classList.remove("hidden");
 }
 
 function clearPlanner() {
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(LEAD_STORAGE_KEY);
 
   document.getElementById("oldAddress").value = "";
   document.getElementById("oldPostcode").value = "";
@@ -528,6 +621,12 @@ function clearPlanner() {
   document.getElementById("hasCar").checked = false;
   document.getElementById("isRenter").checked = false;
 
+  const leadEmail = document.getElementById("leadEmail");
+  const leadConsent = document.getElementById("leadConsent");
+
+  if (leadEmail) leadEmail.value = "";
+  if (leadConsent) leadConsent.checked = false;
+
   document.getElementById("checklist").innerHTML = "";
   document.getElementById("timeline").innerHTML = "";
   document.getElementById("offers").innerHTML = "";
@@ -536,6 +635,8 @@ function clearPlanner() {
 
   document.getElementById("progressText").textContent = "0%";
   document.getElementById("progressFill").style.width = "0%";
+
+  setLeadMessage("");
 }
 
 function runPrintMode(mode) {
