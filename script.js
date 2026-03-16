@@ -306,7 +306,7 @@ function updateProgress() {
   }
 
   let checked = 0;
-  checkboxes.forEach(box => {
+  checkboxes.forEach((box) => {
     if (box.checked) checked++;
   });
 
@@ -316,7 +316,7 @@ function updateProgress() {
 
   const saved = loadPlannerData();
   if (saved) {
-    saved.checkedItems = Array.from(checkboxes).map(box => box.checked);
+    saved.checkedItems = Array.from(checkboxes).map((box) => box.checked);
     savePlannerData(saved);
   }
 }
@@ -342,7 +342,6 @@ function getActionButton(item) {
 function renderChecklist(items, checkedItems = []) {
   const checklist = document.getElementById("checklist");
   checklist.innerHTML = "";
-  checklist.className = "checklist-list";
 
   items.forEach((item, index) => {
     const row = document.createElement("div");
@@ -367,7 +366,7 @@ function renderChecklist(items, checkedItems = []) {
     checklist.appendChild(row);
   });
 
-  document.querySelectorAll(".task-checkbox").forEach(box => {
+  document.querySelectorAll(".task-checkbox").forEach((box) => {
     box.addEventListener("change", updateProgress);
   });
 
@@ -378,11 +377,11 @@ function renderTimeline(timelineData) {
   const timeline = document.getElementById("timeline");
   timeline.innerHTML = "";
 
-  timelineData.forEach(block => {
+  timelineData.forEach((block) => {
     const div = document.createElement("div");
     div.className = "timeline-block";
 
-    const tasksHtml = block.tasks.map(task => `<li>${task}</li>`).join("");
+    const tasksHtml = block.tasks.map((task) => `<li>${task}</li>`).join("");
 
     div.innerHTML = `
       <h3>${block.title}</h3>
@@ -397,7 +396,7 @@ function renderOffers(offers) {
   const offersBox = document.getElementById("offers");
   offersBox.innerHTML = "";
 
-  offers.forEach(offer => {
+  offers.forEach((offer) => {
     const card = document.createElement("div");
     card.className = "offer-card";
 
@@ -415,7 +414,7 @@ function renderPostcodeTools(tools) {
   const toolsBox = document.getElementById("postcodeTools");
   toolsBox.innerHTML = "";
 
-  tools.forEach(tool => {
+  tools.forEach((tool) => {
     const card = document.createElement("div");
     card.className = "offer-card";
 
