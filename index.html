@@ -24,15 +24,23 @@
         <label><input type="checkbox" id="isRenter"> I rent my home</label>
       </div>
 
-      <button onclick="buildPlanner()">Generate My Plan</button>
+      <div class="button-row">
+        <button onclick="buildPlanner()">Generate My Plan</button>
+        <button type="button" class="secondary-btn" onclick="clearPlanner()">Clear Plan</button>
+      </div>
     </div>
 
     <div id="results" class="hidden">
-      <div class="section">
+      <div class="section highlight">
         <h2>Your Moving Summary</h2>
         <p><strong>Old address:</strong> <span id="summaryOld"></span></p>
         <p><strong>New address:</strong> <span id="summaryNew"></span></p>
         <p><strong>Move date:</strong> <span id="summaryDate"></span></p>
+        <p><strong>Days until move:</strong> <span id="summaryCountdown"></span></p>
+        <p><strong>Checklist progress:</strong> <span id="progressText">0%</span></p>
+        <div class="progress-bar">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
       </div>
 
       <div class="section">
