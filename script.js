@@ -1,3 +1,5 @@
+const STORAGE_KEY = "movingAdminPlannerData";
+
 function formatDate(dateValue) {
   if (!dateValue) return "Not provided";
   const date = new Date(dateValue);
@@ -8,18 +10,24 @@ function formatDate(dateValue) {
   });
 }
 
-function buildPlanner() {
-  const oldAddress = document.getElementById("oldAddress").value.trim();
-  const newAddress = document.getElementById("newAddress").value.trim();
-  const moveDate = document.getElementById("moveDate").value;
-  const hasCar = document.getElementById("hasCar").checked;
-  const isRenter = document.getElementById("isRenter").checked;
+function daysUntilMove(dateValue) {
+  if (!dateValue) return "Not provided";
 
-  if (!oldAddress || !newAddress || !moveDate) {
-    alert("Please fill in old address, new address, and move date.");
-    return;
-  }
+  const today = new Date();
+  const moveDate = new Date(dateValue);
 
+  today.setHours(0, 0, 0, 0);
+  moveDate.setHours(0, 0, 0, 0);
+
+  const diffMs = moveDate - today;
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays > 0) return `${diffDays} day(s)`;
+  if (diffDays === 0) return "Moving today";
+  return `${Math.abs(diffDays)} day(s) ago`;
+}
+
+function getChecklistItems(hasCar, isRenter) {
   const checklistItems = [
     "Update bank accounts",
     "Update HMRC records",
@@ -49,7 +57,11 @@ function buildPlanner() {
     checklistItems.push("Check buildings and contents insurance for new property");
   }
 
-  const timelineData = [
+  return checklistItems;
+}
+
+function getTimelineData() {
+  return [
     {
       title: "4 weeks before move",
       tasks: [
@@ -96,20 +108,68 @@ function buildPlanner() {
       ]
     }
   ];
+}
 
-  document.getElementById("summaryOld").textContent = oldAddress;
-  document.getElementById("summaryNew").textContent = newAddress;
-  document.getElementById("summaryDate").textContent = formatDate(moveDate);
+function savePlannerData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
 
+function loadPlannerData() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  return raw ? JSON.parse(raw) : null;
+}
+
+function updateProgress() {
+  const checkboxes = document.querySelectorAll(".task-checkbox");
+  const total = checkboxes.length;
+
+  if (total === 0) {
+    document.getElementById("progressText").textContent = "0%";
+    document.getElementById("progressFill").style.width = "0%";
+    return;
+  }
+
+  let checked = 0;
+  checkboxes.forEach(box => {
+    if (box.checked) checked++;
+  });
+
+  const percent = Math.round((checked / total) * 100);
+  document.getElementById("progressText").textContent = `${percent}% (${checked}/${total})`;
+  document.getElementById("progressFill").style.width = `${percent}%`;
+
+  const saved = loadPlannerData();
+  if (saved) {
+    saved.checkedItems = Array.from(checkboxes).map(box => box.checked);
+    savePlannerData(saved);
+  }
+}
+
+function renderChecklist(items, checkedItems = []) {
   const checklist = document.getElementById("checklist");
   checklist.innerHTML = "";
 
-  checklistItems.forEach(item => {
+  items.forEach((item, index) => {
     const li = document.createElement("li");
-    li.innerHTML = `<label><input type="checkbox"> ${item}</label>`;
+
+    li.innerHTML = `
+      <label class="check-item">
+        <input type="checkbox" class="task-checkbox" data-index="${index}" ${checkedItems[index] ? "checked" : ""}>
+        ${item}
+      </label>
+    `;
+
     checklist.appendChild(li);
   });
 
+  document.querySelectorAll(".task-checkbox").forEach(box => {
+    box.addEventListener("change", updateProgress);
+  });
+
+  updateProgress();
+}
+
+function renderTimeline(timelineData) {
   const timeline = document.getElementById("timeline");
   timeline.innerHTML = "";
 
@@ -126,6 +186,76 @@ function buildPlanner() {
 
     timeline.appendChild(div);
   });
+}
+
+function fillSummary(oldAddress, newAddress, moveDate) {
+  document.getElementById("summaryOld").textContent = oldAddress.replace(/\n/g, " ");
+  document.getElementById("summaryNew").textContent = newAddress.replace(/\n/g, " ");
+  document.getElementById("summaryDate").textContent = formatDate(moveDate);
+  document.getElementById("summaryCountdown").textContent = daysUntilMove(moveDate);
+}
+
+function buildPlanner() {
+  const oldAddress = document.getElementById("oldAddress").value.trim();
+  const newAddress = document.getElementById("newAddress").value.trim();
+  const moveDate = document.getElementById("moveDate").value;
+  const hasCar = document.getElementById("hasCar").checked;
+  const isRenter = document.getElementById("isRenter").checked;
+
+  if (!oldAddress || !newAddress || !moveDate) {
+    alert("Please fill in old address, new address, and move date.");
+    return;
+  }
+
+  const checklistItems = getChecklistItems(hasCar, isRenter);
+  const timelineData = getTimelineData();
+
+  fillSummary(oldAddress, newAddress, moveDate);
+  renderChecklist(checklistItems, []);
+  renderTimeline(timelineData);
+
+  document.getElementById("results").classList.remove("hidden");
+
+  savePlannerData({
+    oldAddress,
+    newAddress,
+    moveDate,
+    hasCar,
+    isRenter,
+    checklistItems,
+    checkedItems: new Array(checklistItems.length).fill(false)
+  });
+}
+
+function restorePlanner() {
+  const saved = loadPlannerData();
+  if (!saved) return;
+
+  document.getElementById("oldAddress").value = saved.oldAddress || "";
+  document.getElementById("newAddress").value = saved.newAddress || "";
+  document.getElementById("moveDate").value = saved.moveDate || "";
+  document.getElementById("hasCar").checked = !!saved.hasCar;
+  document.getElementById("isRenter").checked = !!saved.isRenter;
+
+  fillSummary(saved.oldAddress, saved.newAddress, saved.moveDate);
+  renderChecklist(saved.checklistItems || [], saved.checkedItems || []);
+  renderTimeline(getTimelineData());
 
   document.getElementById("results").classList.remove("hidden");
 }
+
+function clearPlanner() {
+  localStorage.removeItem(STORAGE_KEY);
+
+  document.getElementById("oldAddress").value = "";
+  document.getElementById("newAddress").value = "";
+  document.getElementById("moveDate").value = "";
+  document.getElementById("hasCar").checked = false;
+  document.getElementById("isRenter").checked = false;
+
+  document.getElementById("checklist").innerHTML = "";
+  document.getElementById("timeline").innerHTML = "";
+  document.getElementById("results").classList.add("hidden");
+}
+
+window.addEventListener("load", restorePlanner);
