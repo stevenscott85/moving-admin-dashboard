@@ -13,8 +13,14 @@
       <label>Old address</label>
       <textarea id="oldAddress" placeholder="Enter your old address"></textarea>
 
+      <label>Old postcode</label>
+      <input type="text" id="oldPostcode" placeholder="e.g. SR2 0PA">
+
       <label>New address</label>
       <textarea id="newAddress" placeholder="Enter your new address"></textarea>
+
+      <label>New postcode</label>
+      <input type="text" id="newPostcode" placeholder="e.g. SR2 7RD">
 
       <label>Move date</label>
       <input type="date" id="moveDate">
@@ -34,7 +40,9 @@
       <div class="section highlight">
         <h2>Your Moving Summary</h2>
         <p><strong>Old address:</strong> <span id="summaryOld"></span></p>
+        <p><strong>Old postcode:</strong> <span id="summaryOldPostcode"></span></p>
         <p><strong>New address:</strong> <span id="summaryNew"></span></p>
+        <p><strong>New postcode:</strong> <span id="summaryNewPostcode"></span></p>
         <p><strong>Move date:</strong> <span id="summaryDate"></span></p>
         <p><strong>Days until move:</strong> <span id="summaryCountdown"></span></p>
         <p><strong>Checklist progress:</strong> <span id="progressText">0%</span></p>
@@ -51,6 +59,11 @@
       <div class="section">
         <h2>Your Moving Timeline</h2>
         <div id="timeline"></div>
+      </div>
+
+      <div class="section">
+        <h2>Postcode-Based Tools</h2>
+        <div id="postcodeTools" class="offers-grid"></div>
       </div>
 
       <div class="section">
