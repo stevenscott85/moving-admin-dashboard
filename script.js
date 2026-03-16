@@ -276,12 +276,12 @@ function getPostcodeTools(newPostcode) {
     {
       title: "Get Removals Quotes",
       text: `Compare removal companies for ${cleaned}.`,
-      link: `https://www.comparemymove.com/removals`
+      link: "https://www.comparemymove.com/removals"
     },
     {
       title: "Check Ofcom Broadband & Mobile Coverage",
       text: `View mobile and broadband coverage for ${cleaned}.`,
-      link: `https://checker.ofcom.org.uk/en-gb/broadband-coverage`
+      link: "https://checker.ofcom.org.uk/en-gb/broadband-coverage"
     }
   ];
 }
@@ -539,12 +539,23 @@ function clearPlanner() {
   document.getElementById("progressFill").style.width = "0%";
 }
 
-function printChecklist() {
-  document.body.classList.add("print-checklist-only");
+function runPrintMode(mode) {
+  document.body.classList.remove("print-checklist-only", "print-full-plan");
+  document.body.classList.add(mode);
+
   window.print();
+
   setTimeout(() => {
-    document.body.classList.remove("print-checklist-only");
+    document.body.classList.remove("print-checklist-only", "print-full-plan");
   }, 300);
+}
+
+function printChecklistOnly() {
+  runPrintMode("print-checklist-only");
+}
+
+function printFullPlan() {
+  runPrintMode("print-full-plan");
 }
 
 window.addEventListener("load", restorePlanner);
