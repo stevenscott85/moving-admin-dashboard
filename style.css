@@ -31,3 +31,23 @@ button {
 button:hover {
   background: #1e4ed8;
 }
+
+.planner {
+  margin-top: 30px;
+}
+
+.hidden {
+  display: none;
+}
+
+ul {
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+button:hover {
+  background: #1e4ed8;
+}
