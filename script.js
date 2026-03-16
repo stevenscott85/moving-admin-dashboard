@@ -27,6 +27,19 @@ function daysUntilMove(dateValue) {
   return `${Math.abs(diffDays)} day(s) ago`;
 }
 
+function normalisePostcode(postcode) {
+  return postcode.trim().toUpperCase();
+}
+
+function isValidUkPostcode(postcode) {
+  const regex = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i;
+  return regex.test(postcode.trim());
+}
+
+function encodeQuery(text) {
+  return encodeURIComponent(text);
+}
+
 function getChecklistItems(hasCar, isRenter) {
   const items = [
     {
@@ -246,6 +259,33 @@ function getOffers(hasCar, isRenter) {
   return offers;
 }
 
+function getPostcodeTools(newPostcode) {
+  const cleaned = normalisePostcode(newPostcode);
+
+  return [
+    {
+      title: "Find Your Local Council",
+      text: `Search for the council covering ${cleaned}.`,
+      link: `https://www.gov.uk/find-local-council?postcode=${encodeQuery(cleaned)}`
+    },
+    {
+      title: "Check Broadband Options",
+      text: `Search broadband availability for ${cleaned}.`,
+      link: `https://www.uswitch.com/broadband/postcode-checker/?postcode=${encodeQuery(cleaned)}`
+    },
+    {
+      title: "Get Removals Quotes",
+      text: `Compare removal companies for ${cleaned}.`,
+      link: `https://www.comparemymove.com/removals`
+    },
+    {
+      title: "Check Ofcom Broadband & Mobile Coverage",
+      text: `View mobile and broadband coverage for ${cleaned}.`,
+      link: `https://checker.ofcom.org.uk/en-gb/broadband-coverage`
+    }
+  ];
+}
+
 function savePlannerData(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
@@ -282,12 +322,8 @@ function updateProgress() {
 }
 
 function getBadge(type) {
-  if (type === "official") {
-    return `<span class="badge badge-official">Official</span>`;
-  }
-  if (type === "partner") {
-    return `<span class="badge badge-partner">Partner</span>`;
-  }
+  if (type === "official") return `<span class="badge badge-official">Official</span>`;
+  if (type === "partner") return `<span class="badge badge-partner">Partner</span>`;
   return `<span class="badge badge-manual">Manual</span>`;
 }
 
@@ -375,39 +411,74 @@ function renderOffers(offers) {
   });
 }
 
-function fillSummary(oldAddress, newAddress, moveDate) {
+function renderPostcodeTools(tools) {
+  const toolsBox = document.getElementById("postcodeTools");
+  toolsBox.innerHTML = "";
+
+  tools.forEach(tool => {
+    const card = document.createElement("div");
+    card.className = "offer-card";
+
+    card.innerHTML = `
+      <h3>${tool.title}</h3>
+      <p>${tool.text}</p>
+      <a href="${tool.link}" target="_blank" rel="noopener noreferrer">Open tool</a>
+    `;
+
+    toolsBox.appendChild(card);
+  });
+}
+
+function fillSummary(oldAddress, oldPostcode, newAddress, newPostcode, moveDate) {
   document.getElementById("summaryOld").textContent = oldAddress.replace(/\n/g, " ");
+  document.getElementById("summaryOldPostcode").textContent = oldPostcode;
   document.getElementById("summaryNew").textContent = newAddress.replace(/\n/g, " ");
+  document.getElementById("summaryNewPostcode").textContent = newPostcode;
   document.getElementById("summaryDate").textContent = formatDate(moveDate);
   document.getElementById("summaryCountdown").textContent = daysUntilMove(moveDate);
+
+  document.getElementById("printMoveDate").textContent = formatDate(moveDate);
+  document.getElementById("printOldPostcode").textContent = oldPostcode;
+  document.getElementById("printNewPostcode").textContent = newPostcode;
 }
 
 function buildPlanner() {
   const oldAddress = document.getElementById("oldAddress").value.trim();
+  const oldPostcode = normalisePostcode(document.getElementById("oldPostcode").value);
   const newAddress = document.getElementById("newAddress").value.trim();
+  const newPostcode = normalisePostcode(document.getElementById("newPostcode").value);
   const moveDate = document.getElementById("moveDate").value;
   const hasCar = document.getElementById("hasCar").checked;
   const isRenter = document.getElementById("isRenter").checked;
 
-  if (!oldAddress || !newAddress || !moveDate) {
-    alert("Please fill in old address, new address, and move date.");
+  if (!oldAddress || !oldPostcode || !newAddress || !newPostcode || !moveDate) {
+    alert("Please fill in old address, old postcode, new address, new postcode, and move date.");
+    return;
+  }
+
+  if (!isValidUkPostcode(oldPostcode) || !isValidUkPostcode(newPostcode)) {
+    alert("Please enter valid UK postcodes.");
     return;
   }
 
   const checklistItems = getChecklistItems(hasCar, isRenter);
   const timelineData = getTimelineData();
   const offers = getOffers(hasCar, isRenter);
+  const postcodeTools = getPostcodeTools(newPostcode);
 
-  fillSummary(oldAddress, newAddress, moveDate);
+  fillSummary(oldAddress, oldPostcode, newAddress, newPostcode, moveDate);
   renderChecklist(checklistItems, []);
   renderTimeline(timelineData);
   renderOffers(offers);
+  renderPostcodeTools(postcodeTools);
 
   document.getElementById("results").classList.remove("hidden");
 
   savePlannerData({
     oldAddress,
+    oldPostcode,
     newAddress,
+    newPostcode,
     moveDate,
     hasCar,
     isRenter,
@@ -421,15 +492,28 @@ function restorePlanner() {
   if (!saved) return;
 
   document.getElementById("oldAddress").value = saved.oldAddress || "";
+  document.getElementById("oldPostcode").value = saved.oldPostcode || "";
   document.getElementById("newAddress").value = saved.newAddress || "";
+  document.getElementById("newPostcode").value = saved.newPostcode || "";
   document.getElementById("moveDate").value = saved.moveDate || "";
   document.getElementById("hasCar").checked = !!saved.hasCar;
   document.getElementById("isRenter").checked = !!saved.isRenter;
 
-  fillSummary(saved.oldAddress, saved.newAddress, saved.moveDate);
+  fillSummary(
+    saved.oldAddress || "",
+    saved.oldPostcode || "",
+    saved.newAddress || "",
+    saved.newPostcode || "",
+    saved.moveDate || ""
+  );
+
   renderChecklist(saved.checklistItems || [], saved.checkedItems || []);
   renderTimeline(getTimelineData());
   renderOffers(getOffers(saved.hasCar, saved.isRenter));
+
+  if (saved.newPostcode) {
+    renderPostcodeTools(getPostcodeTools(saved.newPostcode));
+  }
 
   document.getElementById("results").classList.remove("hidden");
 }
@@ -438,7 +522,9 @@ function clearPlanner() {
   localStorage.removeItem(STORAGE_KEY);
 
   document.getElementById("oldAddress").value = "";
+  document.getElementById("oldPostcode").value = "";
   document.getElementById("newAddress").value = "";
+  document.getElementById("newPostcode").value = "";
   document.getElementById("moveDate").value = "";
   document.getElementById("hasCar").checked = false;
   document.getElementById("isRenter").checked = false;
@@ -446,10 +532,19 @@ function clearPlanner() {
   document.getElementById("checklist").innerHTML = "";
   document.getElementById("timeline").innerHTML = "";
   document.getElementById("offers").innerHTML = "";
+  document.getElementById("postcodeTools").innerHTML = "";
   document.getElementById("results").classList.add("hidden");
 
   document.getElementById("progressText").textContent = "0%";
   document.getElementById("progressFill").style.width = "0%";
+}
+
+function printChecklist() {
+  document.body.classList.add("print-checklist-only");
+  window.print();
+  setTimeout(() => {
+    document.body.classList.remove("print-checklist-only");
+  }, 300);
 }
 
 window.addEventListener("load", restorePlanner);
